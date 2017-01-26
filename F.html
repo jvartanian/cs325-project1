@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tocino - 3F</title>
+</head>
+
+<body>
+
+    <input type="file" id="fileInput1" accept="text/plain">
+    <span>Cutoff percentage: </span><select id="percentageSelect"></select><br>
+    <button type="button" id="submitButton" disabled>Submit</button>
+    <div id="percentageDiv"></div>
+    <div id="cutoffDiv"></div>
+
+    <script type="text/javascript">
+        function autorun() {
+            var file1;
+
+            //Given an array of percentages, calculate the spam message percentage
+            function calculateSpamMessagePercentage(percentages) {
+                var sumTop = 0,
+                    sumBot = 0;
+                for (var i = 0; i < percentages.length; i++) {
+                    sumTop += percentages[i];
+                    sumBot += (1 - percentages[i]);
+                }
+                var result = (sumTop) / (sumBot + sumTop);
+                result = result.toFixed(2);
+                return result;
+            }
+
+            //enable or disable the submit button on file select
+            document.getElementById('fileInput1').onchange = function() {
+                if (this.files[0] != null) {
+                    file1 = this.files[0];
+                    document.getElementById('submitButton').disabled = false;
+                } else {
+                    document.getElementById('submitButton').disabled = true;
+                }
+            };
+
+            //fill dropdown menu
+            var dropdown = document.getElementById('percentageSelect');
+            for (var i = 1; i <= 100; i++) {
+                var option = document.createElement("option");
+                option.text = i.toString();
+                dropdown.add(option);
+            }
+
+            //Read file and calculate percentage
+            document.getElementById('submitButton').onclick = function() {
+                //read file
+                var reader = new FileReader();
+                reader.onload = function(progressEvent) {
+                    var fileLines = this.result.split('\n');
+                    var percentages = [];
+                    for (var i = 0; i < fileLines.length; i++) {
+                        var line = parseFloat(fileLines[i]);
+                        if (!isNaN(line)) {
+                            percentages.push(parseFloat(fileLines[i]));
+                        }
+                    }
+
+                    var percentage = calculateSpamMessagePercentage(percentages);
+                    var cutoff = document.getElementById('percentageSelect').value / 100;
+
+                    document.getElementById('percentageDiv').innerHTML = "Spam message percentage: " + percentage.toString();
+
+                    if (percentage > cutoff) {
+                        document.getElementById('cutoffDiv').innerHTML = "Percentage exceeds cutoff of " + cutoff.toString();
+                    } else {
+                        document.getElementById('cutoffDiv').innerHTML = "Percentage does not exceed cutoff of " + cutoff.toString();
+                    }
+                }
+                reader.readAsText(file1);
+            }
+        }
+        if (document.addEventListener) document.addEventListener("DOMContentLoaded", autorun, false);
+        else if (document.attachEvent) document.attachEvent("onreadystatechange", autorun);
+        else window.onload = autorun;
+
+    </script>
+</body>
+
+</html>

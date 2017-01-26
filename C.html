@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tocino - 3C</title>
+</head>
+
+<body>
+
+    <input type="file" id="fileInput1" accept="text/plain">
+    <input type="file" id="fileInput2" accept="text/plain">
+    <button type="button" id="submitButton" disabled>Submit</button>
+
+    <div id="resultList" class="scroll"></div>
+
+    <style>
+        div.scroll {
+            width: 300px;
+            height: 200px;
+            overflow: scroll;
+            background-color: aqua;
+            white-space: pre;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+        function autorun() {
+            var file1, file2;
+
+            //Enable or disable submit button
+            function checkFileInputs() {
+                if (document.getElementById('fileInput1').value && document.getElementById('fileInput2').value) {
+                    document.getElementById('submitButton').disabled = false;
+                } else {
+                    document.getElementById('submitButton').disabled = true;
+                }
+            }
+
+            //perform count word task
+            function countWordOccurrence() {
+                //Read file1
+                var reader1 = new FileReader();
+                reader1.onload = function(progressEvent1) {
+                    var file1Lines = this.result.split('\n');
+                    var file1Occurrences = [];
+                    for (var i = 0; i < file1Lines.length; i++) {
+                        if (file1Lines[i]) {
+                            file1Occurrences[file1Lines[i]] = 0;
+                        }
+                    }
+
+                    var reader2 = new FileReader();
+                    reader2.onload = function(progressEvent2) {
+                        var file2Lines = this.result.split('\n');
+
+                        for (var i = 0; i < file2Lines.length; i++) {
+                            if (file2Lines[i] in file1Occurrences) {
+                                file1Occurrences[file2Lines[i]]++;
+                            }
+                        }
+
+                        var result = "";
+                        for (var key in file1Occurrences) {
+                            if (file1Occurrences.hasOwnProperty(key)) {
+                                result = result + key + " - " + file1Occurrences[key] + '\n';
+                            }
+                        }
+                        document.getElementById('resultList').innerHTML = result;
+                    }
+                    reader2.readAsText(file2);
+                }
+                reader1.readAsText(file1);
+            }
+
+            document.getElementById('fileInput1').onchange = function() {
+                file1 = this.files[0];
+                checkFileInputs();
+            };
+
+            document.getElementById('fileInput2').onchange = function() {
+                file2 = this.files[0];
+                checkFileInputs();
+            };
+
+            document.getElementById('submitButton').onclick = function() {
+                countWordOccurrence();
+            }
+        }
+        if (document.addEventListener) document.addEventListener("DOMContentLoaded", autorun, false);
+        else if (document.attachEvent) document.attachEvent("onreadystatechange", autorun);
+        else window.onload = autorun;
+
+    </script>
+</body>
+
+</html>
