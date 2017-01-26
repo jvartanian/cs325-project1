@@ -54,7 +54,7 @@
                 //read file
                 var reader = new FileReader();
                 reader.onload = function(progressEvent) {
-                    var fileLines = this.result.split('\n');
+                    var fileLines = this.result.split(/\r\n|\r|\n/g);
                     var percentages = [];
                     for (var i = 0; i < fileLines.length; i++) {
                         var line = parseFloat(fileLines[i]);
@@ -80,7 +80,6 @@
         if (document.addEventListener) document.addEventListener("DOMContentLoaded", autorun, false);
         else if (document.attachEvent) document.attachEvent("onreadystatechange", autorun);
         else window.onload = autorun;
-
     </script>
 </body>
 
